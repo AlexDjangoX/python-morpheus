@@ -204,10 +204,10 @@ export default function Home() {
         {/* Hero / Search section */}
         <section className="mb-12">
           <div className="mb-8 text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl">
               {mounted ? t("pageTitle") : FALLBACK.pageTitle}
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 bg-gradient-to-r from-blue-600 to-red-600 bg-clip-text text-sm text-transparent">
               {mounted ? t("searchHint") : FALLBACK.searchHint}
             </p>
           </div>

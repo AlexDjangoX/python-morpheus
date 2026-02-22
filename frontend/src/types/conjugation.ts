@@ -23,10 +23,10 @@ export interface Conjugation {
 
 type TenseBlock<T extends string> = Record<string, string>;
 
-export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { person: string; polishKey: string; transKey: string }[] }[] = [
+export const TENSE_BLOCKS: { key: keyof Conjugation; labelKey: string; rows: { person: string; polishKey: string; transKey: string }[] }[] = [
   {
     key: "present",
-    label: "Present",
+    labelKey: "tensePresent",
     rows: [
       { person: "ja (I)", polishKey: "present_ja", transKey: "present_ja_trans" },
       { person: "ty (you)", polishKey: "present_ty", transKey: "present_ty_trans" },
@@ -38,7 +38,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "past_masc",
-    label: "Past (masculine)",
+    labelKey: "tensePastMasc",
     rows: [
       { person: "ja", polishKey: "past_ja_masc", transKey: "past_ja_masc_trans" },
       { person: "ty", polishKey: "past_ty_masc", transKey: "past_ty_masc_trans" },
@@ -50,7 +50,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "past_fem",
-    label: "Past (feminine)",
+    labelKey: "tensePastFem",
     rows: [
       { person: "ja", polishKey: "past_ja_fem", transKey: "past_ja_fem_trans" },
       { person: "ty", polishKey: "past_ty_fem", transKey: "past_ty_fem_trans" },
@@ -62,7 +62,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "future_masc",
-    label: "Future (masculine)",
+    labelKey: "tenseFutureMasc",
     rows: [
       { person: "ja", polishKey: "future_masc_ja", transKey: "future_masc_ja_trans" },
       { person: "ty", polishKey: "future_masc_ty", transKey: "future_masc_ty_trans" },
@@ -74,7 +74,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "future_fem",
-    label: "Future (feminine)",
+    labelKey: "tenseFutureFem",
     rows: [
       { person: "ja", polishKey: "future_fem_ja", transKey: "future_fem_ja_trans" },
       { person: "ty", polishKey: "future_fem_ty", transKey: "future_fem_ty_trans" },
@@ -86,7 +86,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "imp_future",
-    label: "Future (infinitive)",
+    labelKey: "tenseFutureInfinitive",
     rows: [
       { person: "ja", polishKey: "imp_future_ja", transKey: "imp_future_ja_trans" },
       { person: "ty", polishKey: "imp_future_ty", transKey: "imp_future_ty_trans" },
@@ -98,7 +98,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "imperative",
-    label: "Imperative",
+    labelKey: "tenseImperative",
     rows: [
       { person: "ja", polishKey: "imperative_ja", transKey: "imperative_ja_trans" },
       { person: "ty", polishKey: "imperative_ty", transKey: "imperative_ty_trans" },
@@ -110,7 +110,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "conditional_masculine",
-    label: "Conditional (masculine)",
+    labelKey: "tenseConditionalMasc",
     rows: [
       { person: "ja", polishKey: "conditional_masculine_ja", transKey: "conditional_masculine_ja_trans" },
       { person: "ty", polishKey: "conditional_masculine_ty", transKey: "conditional_masculine_ty_trans" },
@@ -122,7 +122,7 @@ export const TENSE_BLOCKS: { key: keyof Conjugation; label: string; rows: { pers
   },
   {
     key: "conditional_feminine",
-    label: "Conditional (feminine)",
+    labelKey: "tenseConditionalFem",
     rows: [
       { person: "ja", polishKey: "conditional_feminine_ja", transKey: "conditional_feminine_ja_trans" },
       { person: "ty", polishKey: "conditional_feminine_ty", transKey: "conditional_feminine_ty_trans" },

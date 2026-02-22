@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,10 +19,12 @@ function TenseTable({
   data,
   block,
   isActive,
+  getTenseLabel,
 }: {
   data: Conjugation;
   block: (typeof TENSE_BLOCKS)[number];
   isActive: boolean;
+  getTenseLabel: (key: string) => string;
 }) {
   const { t } = useTranslation("common");
   const tenseData = data[block.key] as Record<string, string>;
@@ -54,7 +57,7 @@ function TenseTable({
           <p className="text-xs text-muted-foreground">{data.english_word}</p>
         </div>
         <span className="shrink-0 whitespace-nowrap rounded-full border border-red-500/50 bg-gradient-to-r from-red-500 to-blue-500 px-2.5 py-1 text-xs font-semibold text-white">
-          {block.label}
+          {getTenseLabel(block.labelKey)}
         </span>
       </div>
 
@@ -108,7 +111,26 @@ function TenseTable({
   );
 }
 
+const TENSE_LABEL_FALLBACK: Record<string, string> = {
+  tensePresent: "Present",
+  tensePastMasc: "Past masculine",
+  tensePastFem: "Past feminine",
+  tenseFutureMasc: "Future masculine",
+  tenseFutureFem: "Future feminine",
+  tenseFutureInfinitive: "Future infinitive",
+  tenseImperative: "Imperative",
+  tenseConditionalMasc: "Conditional masculine",
+  tenseConditionalFem: "Conditional feminine",
+};
+
 export function ConjugationTable({ data }: ConjugationTableProps) {
+  const { t } = useTranslation("common");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const getTenseLabel = (labelKey: string) =>
+    mounted ? t(labelKey) : (TENSE_LABEL_FALLBACK[labelKey] ?? labelKey);
+
   return (
     <div className="relative w-full" data-testid="conjugation-table">
       <Tabs defaultValue={TENSE_BLOCKS[0].key} className="w-full">
@@ -127,7 +149,7 @@ export function ConjugationTable({ data }: ConjugationTableProps) {
                   "data-[state=inactive]:border data-[state=inactive]:border-border data-[state=inactive]:bg-muted/60 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-purple-300 data-[state=inactive]:hover:bg-muted data-[state=inactive]:hover:text-foreground dark:data-[state=inactive]:hover:border-purple-600"
                 )}
               >
-                {block.label}
+                {getTenseLabel(block.labelKey)}
               </TabsTrigger>
             );
           })}
@@ -144,6 +166,7 @@ export function ConjugationTable({ data }: ConjugationTableProps) {
                   data={data}
                   block={block}
                   isActive={true}
+                  getTenseLabel={getTenseLabel}
                 />
               </TabsContent>
             );
