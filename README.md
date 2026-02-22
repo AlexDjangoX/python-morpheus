@@ -2,6 +2,14 @@
 
 Educational Polish verb conjugator with a Python backend (Morfeusz2) and Next.js frontend. Enter a Polish verb infinitive and get full conjugations with English translations.
 
+## Opening in Cursor / VS Code
+
+**Use the workspace file** so you get a single Source Control view (no duplicate "morpheus" and "frontend" sections):
+
+- **File → Open Workspace from File...** → select `morpheus.code-workspace`
+
+Or double-click `morpheus.code-workspace` in Explorer. The `frontend` folder appears as a subfolder under Morpheus.
+
 ## Quick Start
 
 From the project root:

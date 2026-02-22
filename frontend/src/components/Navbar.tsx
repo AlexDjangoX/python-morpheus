@@ -43,14 +43,16 @@ export function Navbar() {
           <LanguageSelector />
         </div>
 
-        {/* Center: Brand name */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        {/* Center: Brand name — responsive: short (mobile) → medium (sm) → full (lg) */}
+        <div className="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center">
           <Link
             href="/"
-            className="hidden items-center text-xl font-semibold sm:flex sm:text-2xl"
+            className="flex items-center text-lg font-semibold sm:text-xl lg:text-2xl"
           >
             <span className="bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent">
-              {t("brandName")}
+              <span className="sm:hidden">{t("brandNameShort")}</span>
+              <span className="hidden sm:inline lg:hidden">{t("brandNameMedium")}</span>
+              <span className="hidden lg:inline">{t("brandName")}</span>
             </span>
           </Link>
         </div>

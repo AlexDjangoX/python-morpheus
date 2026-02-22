@@ -11,8 +11,17 @@
   "person": "Osoba",
   "polish": "Polski",
   "english": "Angielski",
-  "searchPlaceholder": "Szukaj po polsku lub angielsku (np. gładzić, to know, kill)",
+  "searchPlaceholder": "Szukaj po polsku lub angielsku",
   "createLabel": "Utwórz \"{{value}}\"",
   "noOptionsMessage": "Brak pasujących czasowników. Wpisz, aby utworzyć.",
-  "englishPlaceholder": "np. to stroke"
+  "englishPlaceholder": "np. to stroke",
+  "tensePresent": "Czas teraźniejszy",
+  "tensePastMasc": "Czas przeszły męski",
+  "tensePastFem": "Czas przeszły żeński",
+  "tenseFutureMasc": "Czas przyszły męski",
+  "tenseFutureFem": "Czas przyszły żeński",
+  "tenseFutureInfinitive": "Czas przyszły złożony",
+  "tenseImperative": "Tryb rozkazujący",
+  "tenseConditionalMasc": "Tryb warunkowy męski",
+  "tenseConditionalFem": "Tryb warunkowy żeński"
 }

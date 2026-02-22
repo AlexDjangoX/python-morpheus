@@ -22,7 +22,7 @@ const FALLBACK = {
   verbLabel: "Verb (infinitive)",
   searchHint: "Search by Polish or English translation",
   englishOptional: "English (optional)",
-  searchPlaceholder: "Search by Polish or English (e.g. gładzić, to know, kill)",
+  searchPlaceholder: "Search by Polish or English",
   createLabel: (value: string) => `Create "${value}"`,
   noOptionsMessage: "No matching verb. Type to create one.",
   englishPlaceholder: "e.g. to stroke",
@@ -126,14 +126,32 @@ export default function Home() {
         boxShadow: isDarkMode
           ? "0 4px 6px -1px rgba(67, 56, 202, 0.3)"
           : "0 4px 6px -1px rgba(99, 102, 241, 0.1)",
+        zIndex: 9999,
       }),
       menuList: (provided: Record<string, unknown>) => ({
         ...provided,
         padding: "4px",
       }),
-      option: (provided: Record<string, unknown>) => ({
+      option: (
+        provided: Record<string, unknown>,
+        state: { isFocused?: boolean; isSelected?: boolean }
+      ) => ({
         ...provided,
         height: 36,
+        backgroundColor: state.isSelected
+          ? isDarkMode
+            ? "#4338ca"
+            : "#818cf8"
+          : state.isFocused
+            ? isDarkMode
+              ? "rgba(67, 56, 202, 0.5)"
+              : "#eef2ff"
+            : "transparent",
+        color: state.isSelected || (state.isFocused && isDarkMode)
+          ? "#ffffff"
+          : isDarkMode
+            ? "#e0e7ff"
+            : "#4338ca",
       }),
       noOptionsMessage: (provided: Record<string, unknown>) => ({
         ...provided,
@@ -182,7 +200,7 @@ export default function Home() {
       <div className="hero-grid pointer-events-none absolute inset-0 z-0" />
       <Navbar />
 
-      <main className="relative z-10 mx-auto max-w-[62rem] px-4 py-10 sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto max-w-[62rem] px-4 py-10 pb-16 sm:px-6 lg:px-8">
         {/* Hero / Search section */}
         <section className="mb-12">
           <div className="mb-8 text-center">
@@ -247,7 +265,7 @@ export default function Home() {
                   }
                   menuPlacement="auto"
                   menuPosition="fixed"
-                  classNames={{ menu: () => "!z-50" }}
+                  classNames={{ menu: () => "!z-[9999]" }}
                     />
                   </div>
                 ) : (

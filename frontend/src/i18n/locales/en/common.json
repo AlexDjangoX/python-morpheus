@@ -11,8 +11,17 @@
   "person": "Person",
   "polish": "Polish",
   "english": "English",
-  "searchPlaceholder": "Search by Polish or English (e.g. gładzić, to know, kill)",
+  "searchPlaceholder": "Search by Polish or English",
   "createLabel": "Create \"{{value}}\"",
   "noOptionsMessage": "No matching verb. Type to create one.",
-  "englishPlaceholder": "e.g. to stroke"
+  "englishPlaceholder": "e.g. to stroke",
+  "tensePresent": "Present",
+  "tensePastMasc": "Past masculine",
+  "tensePastFem": "Past feminine",
+  "tenseFutureMasc": "Future masculine",
+  "tenseFutureFem": "Future feminine",
+  "tenseFutureInfinitive": "Future infinitive",
+  "tenseImperative": "Imperative",
+  "tenseConditionalMasc": "Conditional masculine",
+  "tenseConditionalFem": "Conditional feminine"
 }
