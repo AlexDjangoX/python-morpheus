@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Conjugation } from "@/types/conjugation";
 import { TENSE_BLOCKS } from "@/types/conjugation";
+
+const ROTATE_INTERVAL_MS = 3000;
+const FADE_DURATION_MS = 2000;
 
 /** Person | Polish | English — matches lexical-verb HeroConjugationCarousel grid */
 const TABLE_GRID_CLASS =
@@ -126,53 +128,96 @@ const TENSE_LABEL_FALLBACK: Record<string, string> = {
 export function ConjugationTable({ data }: ConjugationTableProps) {
   const { t } = useTranslation("common");
   const [mounted, setMounted] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   useEffect(() => setMounted(true), []);
+
+  const blocksWithData = TENSE_BLOCKS.filter(
+    (block) => data[block.key] as Record<string, string> | undefined
+  );
+  const blockCount = blocksWithData.length;
+
+  const goToIndex = useCallback(
+    (index: number) => {
+      setCurrentIndex(index % blockCount);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = setInterval(
+          () => setCurrentIndex((prev) => (prev + 1) % blockCount),
+          ROTATE_INTERVAL_MS
+        );
+      }
+    },
+    [blockCount]
+  );
+
+  useEffect(() => {
+    if (blockCount === 0) return;
+    intervalRef.current = setInterval(
+      () => setCurrentIndex((prev) => (prev + 1) % blockCount),
+      ROTATE_INTERVAL_MS
+    );
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [blockCount]);
 
   const getTenseLabel = (labelKey: string) =>
     mounted ? t(labelKey) : (TENSE_LABEL_FALLBACK[labelKey] ?? labelKey);
 
   return (
     <div className="relative w-full" data-testid="conjugation-table">
-      <Tabs defaultValue={TENSE_BLOCKS[0].key} className="w-full">
-        {/* Tense tabs — lexical pill style */}
-        <TabsList className="mb-3 flex h-auto w-full flex-wrap justify-center gap-1.5 rounded-none border-0 bg-transparent p-0">
-          {TENSE_BLOCKS.map((block) => {
-            const tenseData = data[block.key] as Record<string, string>;
-            if (!tenseData) return null;
-            return (
-              <TabsTrigger
-                key={block.key}
-                value={block.key}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
-                  "data-[state=active]:border data-[state=active]:border-red-500/50 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:shadow-sm",
-                  "data-[state=inactive]:border data-[state=inactive]:border-border data-[state=inactive]:bg-muted/60 data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:border-purple-300 data-[state=inactive]:hover:bg-muted data-[state=inactive]:hover:text-foreground dark:data-[state=inactive]:hover:border-purple-600"
-                )}
-              >
-                {getTenseLabel(block.labelKey)}
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
+      {/* Tense pills — clickable + reflect current */}
+      <div className="mb-3 flex h-auto w-full flex-wrap justify-center gap-1.5">
+        {blocksWithData.map((block, index) => (
+          <button
+            key={block.key}
+            type="button"
+            onClick={() => goToIndex(index)}
+            aria-label={getTenseLabel(block.labelKey)}
+            className={cn(
+              "rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
+              index === currentIndex
+                ? "border border-red-500/50 bg-gradient-to-r from-red-500 to-blue-500 text-white shadow-sm"
+                : "border border-border bg-muted/60 text-muted-foreground hover:border-purple-300 hover:bg-muted hover:text-foreground dark:hover:border-purple-600"
+            )}
+          >
+            {getTenseLabel(block.labelKey)}
+          </button>
+        ))}
+      </div>
 
-        {/* Tab content — one card per tense */}
-        <div className="relative min-h-80">
-          {TENSE_BLOCKS.map((block) => {
-            const tenseData = data[block.key] as Record<string, string>;
-            if (!tenseData) return null;
-            return (
-              <TabsContent key={block.key} value={block.key} className="mt-0">
-                <TenseTable
-                  data={data}
-                  block={block}
-                  isActive={true}
-                  getTenseLabel={getTenseLabel}
-                />
-              </TabsContent>
-            );
-          })}
-        </div>
-      </Tabs>
+      {/* Carousel — fade in/out */}
+      <div className="relative min-h-80">
+        {blocksWithData.map((block, index) => {
+          const isActive = index === currentIndex;
+          return (
+            <div
+              key={block.key}
+              className="conjugation-carousel-card"
+              style={{
+                position: isActive ? "relative" : "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: isActive ? 10 : 0,
+                opacity: isActive ? 1 : 0,
+                transform: isActive ? "scale(1)" : "scale(0.98)",
+                pointerEvents: isActive ? "auto" : "none",
+                transition: `opacity ${FADE_DURATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1), transform ${FADE_DURATION_MS}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+              }}
+            >
+              <TenseTable
+                data={data}
+                block={block}
+                isActive={isActive}
+                getTenseLabel={getTenseLabel}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
