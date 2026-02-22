@@ -1,15 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "next-themes";
 import CreatableSelect from "react-select/creatable";
-import type { Theme } from "react-select";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { ConjugationTable } from "@/components/ConjugationTable";
+import { Navbar } from "@/components/Navbar";
 import { fetchConjugation, fetchVerbs } from "@/lib/api";
 import type { Conjugation } from "@/types/conjugation";
-import { TENSE_BLOCKS } from "@/types/conjugation";
+import { PLACEHOLDER_CONJUGATION } from "@/data/placeholderConjugation";
+
+import "@/components/VerbSelect.css";
 
 type VerbOption = { value: string; label: string };
 
+/** Fallback strings for SSR — must match en/common.json so server/client render identically */
+const FALLBACK = {
+  pageTitle: "Conjugate Polish Verbs",
+  verbLabel: "Verb (infinitive)",
+  searchHint: "Search by Polish or English translation",
+  englishOptional: "English (optional)",
+  searchPlaceholder: "Search by Polish or English (e.g. gładzić, to know, kill)",
+  createLabel: (value: string) => `Create "${value}"`,
+  noOptionsMessage: "No matching verb. Type to create one.",
+  englishPlaceholder: "e.g. to stroke",
+  loading: "Loading…",
+  searching: "Searching…",
+  conjugate: "Conjugate",
+} as const;
+
 export default function Home() {
+  const { t } = useTranslation("common");
+  const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [verbOptions, setVerbOptions] = useState<VerbOption[]>([]);
   const [selectedVerb, setSelectedVerb] = useState<VerbOption | null>(null);
@@ -21,6 +45,103 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const resolvedTheme = theme === "system" ? systemTheme : theme;
+  const isDarkMode = resolvedTheme === "dark";
+
+  const selectStyles = useMemo(
+    () => ({
+      control: (
+        baseStyles: Record<string, unknown>,
+        state: { isFocused?: boolean }
+      ) => ({
+        ...baseStyles,
+        borderColor: state.isFocused
+          ? isDarkMode
+            ? "#6366f1"
+            : "#818cf8"
+          : isDarkMode
+            ? "#4338ca"
+            : "#c7d2fe",
+        backgroundColor: isDarkMode
+          ? "rgba(67, 56, 202, 0.2)"
+          : "#eef2ff",
+        width: "100%",
+        color: isDarkMode ? "#e0e7ff" : "#4338ca",
+        fontSize: "1rem",
+        borderRadius: "0.5rem",
+        fontWeight: "400",
+        minWidth: "100%",
+        borderWidth: "1px",
+        minHeight: 42,
+        boxShadow: state.isFocused
+          ? isDarkMode
+            ? "0 0 0 1px #6366f1"
+            : "0 0 0 1px #818cf8"
+          : "none",
+      }),
+      placeholder: (defaultStyles: Record<string, unknown>) => ({
+        ...defaultStyles,
+        color: isDarkMode ? "#a5b4fc" : "#6366f1",
+        fontSize: "1rem",
+      }),
+      singleValue: (provided: Record<string, unknown>) => ({
+        ...provided,
+        color: isDarkMode ? "#e0e7ff" : "#4338ca",
+        fontSize: "1rem",
+      }),
+      input: (provided: Record<string, unknown>) => ({
+        ...provided,
+        color: isDarkMode ? "#e0e7ff" : "#4338ca",
+        minWidth: "100%",
+        flex: "1 1 auto",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap" as const,
+      }),
+      indicatorSeparator: (provided: Record<string, unknown>) => ({
+        ...provided,
+        backgroundColor: isDarkMode ? "#6366f1" : "#a5b4fc",
+      }),
+      dropdownIndicator: (
+        provided: Record<string, unknown>,
+        state: { selectProps?: { menuIsOpen?: boolean } }
+      ) => ({
+        ...provided,
+        color: isDarkMode ? "#a5b4fc" : "#6366f1",
+        transform: state.selectProps?.menuIsOpen
+          ? "rotate(180deg)"
+          : "rotate(0deg)",
+        transition: "transform 0.2s ease",
+      }),
+      clearIndicator: (provided: Record<string, unknown>) => ({
+        ...provided,
+        color: isDarkMode ? "#a5b4fc" : "#6366f1",
+      }),
+      menu: (provided: Record<string, unknown>) => ({
+        ...provided,
+        backgroundColor: isDarkMode ? "#1e1b4b" : "#ffffff",
+        borderRadius: "0.5rem",
+        border: isDarkMode ? "1px solid #4338ca" : "1px solid #c7d2fe",
+        boxShadow: isDarkMode
+          ? "0 4px 6px -1px rgba(67, 56, 202, 0.3)"
+          : "0 4px 6px -1px rgba(99, 102, 241, 0.1)",
+      }),
+      menuList: (provided: Record<string, unknown>) => ({
+        ...provided,
+        padding: "4px",
+      }),
+      option: (provided: Record<string, unknown>) => ({
+        ...provided,
+        height: 36,
+      }),
+      noOptionsMessage: (provided: Record<string, unknown>) => ({
+        ...provided,
+        color: isDarkMode ? "#a5b4fc" : "#6366f1",
+      }),
+    }),
+    [isDarkMode]
+  );
 
   useEffect(() => {
     if (mounted) {
@@ -57,184 +178,142 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50 dark:bg-stone-950">
-      <header className="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900 px-6 py-4">
-        <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-100">
-          Polish Verb Conjugator
-        </h1>
-      </header>
+    <div className="relative min-h-screen bg-background">
+      <div className="hero-grid pointer-events-none absolute inset-0 z-0" />
+      <Navbar />
 
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <form onSubmit={handleSearch} className="mb-8 flex flex-wrap items-end gap-4">
-          <div className="flex-1 min-w-[280px]">
-            <label htmlFor="verb" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
-              Verb (infinitive)
-            </label>
-            <p className="mb-1.5 text-xs text-stone-500 dark:text-stone-400">
-              Search by Polish or English translation
+      <main className="relative z-10 mx-auto max-w-[62rem] px-4 py-10 sm:px-6 lg:px-8">
+        {/* Hero / Search section */}
+        <section className="mb-12">
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {mounted ? t("pageTitle") : FALLBACK.pageTitle}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {mounted ? t("searchHint") : FALLBACK.searchHint}
             </p>
-            {mounted ? (
-              <CreatableSelect
-                inputId="verb"
-                isClearable
-                options={verbOptions}
-                value={selectedVerb}
-                onChange={(opt: VerbOption | null) => {
-                  setSelectedVerb(opt);
-                  // Auto-fill English from dropdown when selecting a known verb
-                  if (opt?.label?.includes(" — ")) {
-                    setEnglish(opt.label.split(" — ")[1]?.trim() ?? "");
-                  } else {
-                    setEnglish("");
-                  }
-                }}
-                onCreateOption={(inputValue: string) => setSelectedVerb({ value: inputValue.trim(), label: inputValue.trim() })}
-                filterOption={(option: { value: string; label: string }, inputValue: string) => {
-                  const q = inputValue.toLowerCase();
-                  return (
-                    option.value.toLowerCase().includes(q) || option.label.toLowerCase().includes(q)
-                  );
-                }}
-                formatCreateLabel={(inputValue: string) => `Create "${inputValue}"`}
-                placeholder="Search by Polish or English (e.g. gładzić, to know, kill)"
-                classNamePrefix="verb-select"
-                noOptionsMessage={() => "No matching verb. Type to create one."}
-                theme={(theme: Theme) => ({
-                  ...theme,
-                  colors: {
-                    ...theme.colors,
-                    neutral0: "#ffffff",
-                    neutral5: "#f5f5f4",
-                    neutral10: "#e7e5e4",
-                    neutral20: "#d6d3d1",
-                    neutral30: "#a8a29e",
-                    neutral40: "#78716c",
-                    neutral50: "#57534e",
-                    neutral60: "#44403c",
-                    neutral70: "#292524",
-                    neutral80: "#1c1917",
-                    neutral90: "#0c0a09",
-                  },
-                })}
-                styles={{
-                  control: (base: React.CSSProperties) => ({ ...base, minHeight: 42 }),
-                  option: (
-                    base: React.CSSProperties,
-                    state: { isFocused: boolean; isSelected: boolean }
-                  ) => ({
-                    ...base,
-                    color: "#1c1917",
-                    backgroundColor: state.isFocused ? "#f5f5f4" : state.isSelected ? "#fef3c7" : "#ffffff",
-                  }),
-                  singleValue: (base: React.CSSProperties) => ({ ...base, color: "#1c1917" }),
-                  input: (base: React.CSSProperties) => ({ ...base, color: "#1c1917" }),
-                  placeholder: (base: React.CSSProperties) => ({ ...base, color: "#78716c" }),
-                  noOptionsMessage: (base: React.CSSProperties) => ({ ...base, color: "#57534e" }),
-                }}
-                menuPortalTarget={typeof document !== "undefined" ? document.body : undefined}
-                menuPosition="fixed"
-                classNames={{
-                  control: () => "!min-h-[42px] !rounded-lg",
-                  menu: () => "!z-50",
-                }}
-              />
-            ) : (
-              <div className="min-h-[42px] rounded-lg border border-stone-300 bg-white px-4 py-2.5 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100">
-                <span className="text-stone-400 dark:text-stone-500">Loading…</span>
-              </div>
-            )}
           </div>
-          <div className="flex-1 min-w-[200px]">
-            <label htmlFor="english" className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
-              English (optional)
-            </label>
-            <input
-              id="english"
-              type="text"
-              value={english}
-              onChange={(e) => setEnglish(e.target.value)}
-              placeholder="e.g. to stroke"
-              className="w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder-stone-500"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading || !selectedVerb?.value?.trim()}
-            className="rounded-lg bg-amber-600 px-6 py-2.5 font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
+
+          <form
+            onSubmit={handleSearch}
+            className="mx-auto max-w-3xl rounded-2xl border border-border bg-card/80 p-6 shadow-lg backdrop-blur-sm sm:p-8"
           >
-            {loading ? "Searching…" : "Conjugate"}
-          </button>
-        </form>
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-6">
+              <div className="flex-1 min-w-0">
+                <Label htmlFor="verb" className="mb-2 block text-sm font-medium">
+                  {mounted ? t("verbLabel") : FALLBACK.verbLabel}
+                </Label>
+                {mounted ? (
+                  <div className="verb-select-wrap" data-testid="verb-select">
+                    <CreatableSelect
+                  inputId="verb"
+                  isClearable
+                  options={verbOptions}
+                  value={selectedVerb}
+                  onChange={(opt: VerbOption | null) => {
+                    setSelectedVerb(opt);
+                    if (opt?.label?.includes(" — ")) {
+                      setEnglish(opt.label.split(" — ")[1]?.trim() ?? "");
+                    } else {
+                      setEnglish("");
+                    }
+                  }}
+                  onCreateOption={(inputValue: string) =>
+                    setSelectedVerb({
+                      value: inputValue.trim(),
+                      label: inputValue.trim(),
+                    })
+                  }
+                  filterOption={(option: { value: string; label: string }, inputValue: string) => {
+                    const q = inputValue.toLowerCase();
+                    return (
+                      option.value.toLowerCase().includes(q) ||
+                      option.label.toLowerCase().includes(q)
+                    );
+                  }}
+                  formatCreateLabel={(inputValue: string) =>
+                    mounted
+                      ? t("createLabel", { value: inputValue })
+                      : FALLBACK.createLabel(inputValue)
+                  }
+                  placeholder={mounted ? t("searchPlaceholder") : FALLBACK.searchPlaceholder}
+                  classNamePrefix="verb-select"
+                  noOptionsMessage={() =>
+                    mounted ? t("noOptionsMessage") : FALLBACK.noOptionsMessage
+                  }
+                  styles={selectStyles}
+                  menuPortalTarget={
+                    typeof document !== "undefined" ? document.body : undefined
+                  }
+                  menuPlacement="auto"
+                  menuPosition="fixed"
+                  classNames={{ menu: () => "!z-50" }}
+                    />
+                  </div>
+                ) : (
+                  <div className="min-h-[42px] rounded-lg border border-input bg-background px-4 py-2.5">
+                    <span className="text-muted-foreground">
+                      {mounted ? t("loading") : FALLBACK.loading}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0 sm:max-w-[220px]">
+                <Label htmlFor="english" className="mb-2 block text-sm font-medium">
+                  {mounted ? t("englishOptional") : FALLBACK.englishOptional}
+                </Label>
+                <input
+                  id="english"
+                  type="text"
+                  value={english}
+                  onChange={(e) => setEnglish(e.target.value)}
+                  placeholder={mounted ? t("englishPlaceholder") : FALLBACK.englishPlaceholder}
+                  className="h-11 w-full rounded-lg border border-input bg-background px-4 py-2.5 text-foreground placeholder-muted-foreground transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:border-indigo-400 dark:focus:ring-indigo-400/20"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading || !selectedVerb?.value?.trim()}
+                size="default"
+                className="shrink-0"
+              >
+                {loading
+                  ? (mounted ? t("searching") : FALLBACK.searching)
+                  : (mounted ? t("conjugate") : FALLBACK.conjugate)}
+              </Button>
+            </div>
+          </form>
+        </section>
 
         {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800 dark:border-red-800 dark:bg-red-950/50 dark:text-red-200">
+          <div className="mx-auto max-w-3xl rounded-xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
             {error}
           </div>
         )}
 
-        {data && (
-          <div className="space-y-8">
-            <div className="rounded-lg border border-stone-200 bg-white p-4 dark:border-stone-700 dark:bg-stone-900">
-              <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">
-                {data.polish_word}
-              </h2>
-              <p className="text-stone-600 dark:text-stone-400">{data.english_word}</p>
-              <span className="mt-1 inline-block rounded bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-700 dark:bg-stone-600 dark:text-stone-200">
-                {data.gram_case_aspect}
-              </span>
+        {/* Conjugation section */}
+        <section className="flex flex-col items-center">
+          {data && (
+            <div className="mb-6 w-full max-w-3xl rounded-xl border border-border bg-card/60 px-5 py-4 backdrop-blur-sm">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-xl font-bold tracking-tight text-foreground">
+                  {data.polish_word}
+                </h2>
+                <span className="text-muted-foreground">—</span>
+                <p className="text-muted-foreground">{data.english_word}</p>
+                <span className="rounded-full border border-red-500/30 bg-gradient-to-r from-red-500/10 to-blue-500/10 px-3 py-1 text-xs font-medium text-foreground">
+                  {data.gram_case_aspect}
+                </span>
+              </div>
             </div>
+          )}
 
-            {TENSE_BLOCKS.map((block) => {
-              const tenseData = data[block.key] as Record<string, string>;
-              if (!tenseData) return null;
-              return (
-                <section
-                  key={block.key}
-                  className="overflow-hidden rounded-lg border border-stone-200 bg-white dark:border-stone-700 dark:bg-stone-900"
-                >
-                  <h3 className="border-b border-stone-200 bg-stone-50 px-4 py-3 font-semibold text-stone-800 dark:border-stone-700 dark:bg-stone-800/50 dark:text-stone-200">
-                    {block.label}
-                  </h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full min-w-[400px]">
-                      <thead>
-                        <tr className="border-b border-stone-200 dark:border-stone-700">
-                          <th className="px-4 py-3 text-left text-sm font-medium text-stone-600 dark:text-stone-400">
-                            Person
-                          </th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-stone-600 dark:text-stone-400">
-                            Polish
-                          </th>
-                          <th className="px-4 py-3 text-left text-sm font-medium text-stone-600 dark:text-stone-400">
-                            English
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {block.rows.map((row) => (
-                          <tr
-                            key={row.polishKey}
-                            className="border-b border-stone-100 last:border-0 dark:border-stone-800"
-                          >
-                            <td className="px-4 py-3 text-sm text-stone-600 dark:text-stone-400">
-                              {row.person}
-                            </td>
-                            <td className="px-4 py-3 font-medium text-stone-900 dark:text-stone-100">
-                              {tenseData[row.polishKey] || "—"}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-stone-600 dark:text-stone-400">
-                              {tenseData[row.transKey] || "—"}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
-              );
-            })}
+          <div className="w-full max-w-3xl">
+            <ConjugationTable data={data ?? PLACEHOLDER_CONJUGATION} />
           </div>
-        )}
+        </section>
       </main>
     </div>
   );

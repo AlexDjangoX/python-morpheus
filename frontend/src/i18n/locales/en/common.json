@@ -1,0 +1,18 @@
+{
+  "pageTitle": "Conjugate Polish Verbs",
+  "brandName": "Polish Verb Conjugator",
+  "verbLabel": "Verb (infinitive)",
+  "searchHint": "Search by Polish or English translation",
+  "englishOptional": "English (optional)",
+  "conjugate": "Conjugate",
+  "searching": "Searching…",
+  "loading": "Loading…",
+  "conjugation": "Conjugation",
+  "person": "Person",
+  "polish": "Polish",
+  "english": "English",
+  "searchPlaceholder": "Search by Polish or English (e.g. gładzić, to know, kill)",
+  "createLabel": "Create \"{{value}}\"",
+  "noOptionsMessage": "No matching verb. Type to create one.",
+  "englishPlaceholder": "e.g. to stroke"
+}

@@ -1,0 +1,18 @@
+{
+  "pageTitle": "Konjuguj czasowniki polskie",
+  "brandName": "Konjugator czasowników polskich",
+  "verbLabel": "Czasownik (bezokolicznik)",
+  "searchHint": "Szukaj po polsku lub angielsku",
+  "englishOptional": "Angielski (opcjonalnie)",
+  "conjugate": "Konjuguj",
+  "searching": "Szukam…",
+  "loading": "Ładowanie…",
+  "conjugation": "Konjugacja",
+  "person": "Osoba",
+  "polish": "Polski",
+  "english": "Angielski",
+  "searchPlaceholder": "Szukaj po polsku lub angielsku (np. gładzić, to know, kill)",
+  "createLabel": "Utwórz \"{{value}}\"",
+  "noOptionsMessage": "Brak pasujących czasowników. Wpisz, aby utworzyć.",
+  "englishPlaceholder": "np. to stroke"
+}

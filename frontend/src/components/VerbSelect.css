@@ -1,0 +1,47 @@
+/* Option styling via CSS so react-select does not run JS per option on hover (eliminates lag) */
+
+.verb-select-wrap .verb-select__option {
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+/* Light – default */
+.verb-select-wrap .verb-select__option {
+  background-color: transparent;
+  color: #4338ca;
+}
+.verb-select-wrap .verb-select__option--is-focused {
+  background-color: #eef2ff;
+  color: #4338ca;
+}
+.verb-select-wrap .verb-select__option--is-selected {
+  background-color: #818cf8;
+  color: white;
+}
+.verb-select-wrap .verb-select__option:hover {
+  background-color: #c7d2fe;
+  color: #312e81;
+}
+
+/* Dark */
+.dark .verb-select-wrap .verb-select__option {
+  background-color: transparent;
+  color: #e0e7ff;
+}
+.dark .verb-select-wrap .verb-select__option--is-focused {
+  background-color: rgba(67, 56, 202, 0.3);
+  color: #e0e7ff;
+}
+.dark .verb-select-wrap .verb-select__option--is-selected {
+  background-color: #4338ca;
+  color: white;
+}
+.dark .verb-select-wrap .verb-select__option:hover {
+  background-color: rgba(67, 56, 202, 0.5);
+  color: white;
+}
+
+/* Create option styling */
+.verb-select-wrap .verb-select__option[class*="create"] {
+  font-style: italic;
+}
